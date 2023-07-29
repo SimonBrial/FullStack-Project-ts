@@ -1,1 +1,1 @@
-Quedamos en el minuto 02:43:07
+Quedamos en el minuto 00:19:20

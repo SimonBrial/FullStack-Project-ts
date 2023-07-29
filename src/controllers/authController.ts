@@ -3,12 +3,16 @@ import bcrypt from "bcryptjs";
 import createAccessToken from "../libs/jwt";
 import User from "../models/userModel";
 import { AuthRequest } from "../interface/interface";
-
+import jwt from "jsonwebtoken";
 
 const register = async (req: Request, res: Response) => {
     const { email, password, userName } = req.body;
 
     try {
+        const userFound = await User.findOne({ email });
+        if (userFound) {
+            return res.status(400).json(["The email already exists"]);
+        }
         const passwordHash = await bcrypt.hash(password, 10);
 
         const newUser = new User({
@@ -58,6 +62,13 @@ const login = async (req: Request, res: Response) => {
         const token = await createAccessToken({ id: userFound._id });
 
         res.cookie("token", token);
+        /*
+        {
+            sameSite: "none",
+            httpOnly: true,
+            secure: true,
+        }
+        */
         res.json({
             id: userFound._id,
             userName: userFound.userName,
@@ -95,4 +106,26 @@ const profile = async (req: AuthRequest, res: Response) => {
     });
 };
 
-export { register, login, logOut, profile };
+const verifyToken = async (req: AuthRequest, res: Response) => {
+    const secretKey = "secret.01";
+    const { token } = req.cookies;
+
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+    jwt.verify(token, secretKey, async (err:any, user:any) => {
+        if (err) return res.status(401).json({ message: "Unauthorized" });
+
+        const userFound = await User.findById(user.id);
+
+        if (!userFound)
+            return res.status(401).json({ message: "Unauthorized" });
+
+        return res.json({
+            id: userFound._id,
+            userName: userFound.userName,
+            email: userFound.email,
+        });
+    });
+};
+
+export { register, login, logOut, profile, verifyToken };

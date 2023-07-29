@@ -8,9 +8,9 @@ const validateSchema =
             schema.parse(req.body);
             next();
         } catch (err: any) {
-            return res.status(400).json({
-                message: err.errors.map((error: any) => error.message),
-            });
+            return res
+                .status(400)
+                .json(err.errors.map((error: any) => error.message));
         }
     };
 

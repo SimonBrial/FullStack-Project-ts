@@ -26,7 +26,7 @@ const loginShema = z.object({
             required_error: "Email must be provided",
         })
         .email({
-            message: "Invalid email",
+            message: "Email is not valid",
         }),
     password: z
         .string({

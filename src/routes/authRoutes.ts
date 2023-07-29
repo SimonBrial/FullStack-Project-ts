@@ -1,9 +1,10 @@
 import { Router } from "express";
 import {
-    login,
+    verifyToken,
     register,
-    logOut,
     profile,
+    logOut,
+    login,
 } from "../controllers/authController";
 import { authRequired } from "../middleware/validateToken";
 import { validateSchema } from "../middleware/validatorMiddelware";
@@ -14,6 +15,7 @@ const router = Router();
 router.post("/register", validateSchema(registerSchema), register);
 router.post("/login", validateSchema(loginShema), login);
 router.post("/logout", logOut);
+router.get("/verify", verifyToken);
 router.get("/profile", authRequired, profile);
 
 export { router as authRouter };
